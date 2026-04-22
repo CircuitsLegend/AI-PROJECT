@@ -9,6 +9,7 @@
 **System:** A three-agent pipeline system that: (1) validates and maps agent names to business names, (2) transforms data using either an LLM (FLAN-T5) or deterministic replacement, and (3) splits results by status code and writes them into an Excel template with proper formatting.
 
 **Architecture Diagram:**
+```
 USER INPUT (Data files: template, export, agents)
 |
 v
@@ -47,8 +48,7 @@ v
 | OUTPUT |
 | (formatted Excel file) |
 +-----------------------------+
-
-text
+```
 
 ## 4.2 Agent Design
 
