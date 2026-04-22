@@ -1,0 +1,184 @@
+
+---
+
+## File 2: Eval Suite (eval_suite.json)
+
+```json
+{
+  "description": "Test cases for the agentic data pipeline system",
+  "evaluation_dimensions": ["correctness", "robustness"],
+  "test_cases": [
+    {
+      "id": "TC01",
+      "name": "Happy path - basic replacement",
+      "dimension": "correctness",
+      "input": {
+        "agent_name": "John Smith",
+        "business_name": "Smith Enterprises",
+        "status": "A",
+        "amount": 1000
+      },
+      "expected_output": {
+        "agent_name": "Smith Enterprises",
+        "status": "A",
+        "amount": 1000
+      },
+      "adversarial": false
+    },
+    {
+      "id": "TC02",
+      "name": "Missing business name - bold agent name",
+      "dimension": "correctness",
+      "input": {
+        "agent_name": "Jane Doe",
+        "business_name": null,
+        "status": "C",
+        "amount": 500
+      },
+      "expected_output": {
+        "agent_name": "**Jane Doe**",
+        "status": "C",
+        "amount": 500
+      },
+      "adversarial": false
+    },
+    {
+      "id": "TC03",
+      "name": "Money column formatting",
+      "dimension": "correctness",
+      "input": {
+        "agent_name": "Bob Wilson",
+        "business_name": "Wilson Corp",
+        "status": "P",
+        "salary": 1234.56
+      },
+      "expected_output": {
+        "agent_name": "Wilson Corp",
+        "status": "P",
+        "salary": "$1,234.56"
+      },
+      "adversarial": false
+    },
+    {
+      "id": "TC04",
+      "name": "Sort by agent name",
+      "dimension": "correctness",
+      "input": {
+        "rows": [
+          {"agent_name": "Zebra Agent", "business_name": "Zebra Co", "status": "A"},
+          {"agent_name": "Alpha Agent", "business_name": "Alpha Inc", "status": "A"}
+        ]
+      },
+      "expected_output_order": ["Alpha Agent", "Zebra Agent"],
+      "adversarial": false
+    },
+    {
+      "id": "TC05",
+      "name": "Drop columns",
+      "dimension": "correctness",
+      "input": {
+        "agent_name": "Test Agent",
+        "business_name": "Test Corp",
+        "status": "A",
+        "temp_column": "should_be_dropped",
+        "notes": "should_be_dropped"
+      },
+      "expected_output_columns": ["agent_name", "business_name", "status"],
+      "adversarial": false
+    },
+    {
+      "id": "TC06",
+      "name": "ADVERSARIAL - Empty agent name",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "",
+        "business_name": "Empty Name Co",
+        "status": "A"
+      },
+      "expected_behavior": "Row is rejected with validation error",
+      "adversarial": true,
+      "failure_mode": "Empty required field"
+    },
+    {
+      "id": "TC07",
+      "name": "ADVERSARIAL - Invalid status value",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "Test Agent",
+        "business_name": "Test Corp",
+        "status": "X"
+      },
+      "expected_behavior": "Column detection fails or row is excluded",
+      "adversarial": true,
+      "failure_mode": "Unexpected enum value"
+    },
+    {
+      "id": "TC08",
+      "name": "ADVERSARIAL - Extremely long agent name",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "A" * 500,
+        "business_name": "Long Name Co",
+        "status": "A"
+      },
+      "expected_behavior": "Validation fails (max 256 chars)",
+      "adversarial": true,
+      "failure_mode": "Input length overflow"
+    },
+    {
+      "id": "TC09",
+      "name": "Missing required column",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "Test Agent",
+        "status": "A"
+      },
+      "expected_behavior": "Validation error - business_name missing",
+      "adversarial": false,
+      "failure_mode": "Schema violation"
+    },
+    {
+      "id": "TC10",
+      "name": "Special characters in names",
+      "dimension": "correctness",
+      "input": {
+        "agent_name": "O'Brien & Sons",
+        "business_name": "O'Brien Enterprises",
+        "status": "C"
+      },
+      "expected_output": {
+        "agent_name": "O'Brien Enterprises",
+        "status": "C"
+      },
+      "adversarial": false
+    },
+    {
+      "id": "TC11",
+      "name": "Null values in non-required column",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "Test Agent",
+        "business_name": "Test Corp",
+        "status": null,
+        "optional_field": null
+      },
+      "expected_behavior": "Null status causes detection failure",
+      "adversarial": false,
+      "failure_mode": "Missing status values"
+    },
+    {
+      "id": "TC12",
+      "name": "Multiple status columns ambiguity",
+      "dimension": "robustness",
+      "input": {
+        "agent_name": "Test",
+        "business_name": "Test",
+        "status_col1": "A",
+        "status_col2": "C"
+      },
+      "expected_behavior": "Error: multiple possible status columns",
+      "adversarial": true,
+      "failure_mode": "Ambiguous column detection"
+    }
+  ]
+}
